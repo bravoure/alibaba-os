@@ -1,13 +1,13 @@
 {
-  "name": "craftcms/aws-s3",
-  "description": "Amazon S3 integration for Craft CMS",
+  "name": "craftcms/alibaba-oss",
+  "description": "Alibaba Cloud OSS integration for Craft CMS",
   "type": "craft-plugin",
   "keywords": [
-    "aws",
+    "alibaba",
     "cms",
     "craftcms",
     "flysystem",
-    "s3",
+    "oss",
     "yii2"
   ],
   "license": "MIT",
@@ -19,10 +19,10 @@
   ],
   "support": {
     "email": "support@craftcms.com",
-    "issues": "https://github.com/craftcms/aws-s3/issues?state=open",
-    "source": "https://github.com/craftcms/aws-s3",
-    "docs": "https://github.com/craftcms/aws-s3/blob/master/README.md",
-    "rss": "https://github.com/craftcms/aws-s3/commits/master.atom"
+    "issues": "https://github.com/bravoure/alibaba-oss/issues?state=open",
+    "source": "https://github.com/bravoure/alibaba-oss",
+    "docs": "https://github.com/bravoure/alibaba-oss/blob/master/README.md",
+    "rss": "https://github.com/bravoure/alibaba-oss/commits/master.atom"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
@@ -30,7 +30,9 @@
     "php": "^8.0.2",
     "craftcms/cms": "^4.0.0-beta.1",
     "craftcms/flysystem": "^1.0.0-beta.2",
-    "league/flysystem-aws-s3-v3": "^3.0.0"
+    "league/flysystem-aws-s3-v3": "^3.0.0",
+    "aliyuncs/oss-sdk-php": "^2.6",
+    "iidestiny/flysystem-oss": "^4"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
@@ -39,7 +41,7 @@
   },
   "autoload": {
     "psr-4": {
-      "craft\\awss3\\": "src/"
+      "craft\\alibabaoss\\": "src/"
     }
   },
   "scripts": {
@@ -48,9 +50,9 @@
     "phpstan": "phpstan --memory-limit=1G"
   },
   "extra": {
-    "name": "Amazon S3",
-    "handle": "aws-s3",
-    "documentationUrl": "https://github.com/craftcms/aws-s3/blob/master/README.md"
+    "name": "Alibaba OSS",
+    "handle": "alibaba-oss",
+    "documentationUrl": "https://github.com/bravoure/alibaba-oss/blob/master/README.md"
   },
   "config": {
     "platform": {

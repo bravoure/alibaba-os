@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-namespace craft\awss3;
+namespace craft\alibabaoss;
 
 use craft\web\assets\cp\CpAsset;
 use yii\web\AssetBundle;
@@ -13,12 +13,12 @@ use yii\web\AssetBundle;
 /**
  * Asset bundle for the Dashboard
  */
-class AwsS3Bundle extends AssetBundle
+class AlibabaOssBundle extends AssetBundle
 {
     /**
      * @inheritdoc
      */
-    public $sourcePath = '@craft/awss3/resources';
+    public $sourcePath = '@craft/alibabaoss/resources';
 
     /**
      * @inheritdoc

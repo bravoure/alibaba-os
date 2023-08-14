@@ -5,10 +5,10 @@
  * @license MIT
  */
 
-namespace craft\awss3\migrations;
+namespace craft\alibabaoss\migrations;
 
 use Craft;
-use craft\awss3\Fs;
+use craft\alibabaoss\Fs;
 use craft\db\Migration;
 use craft\services\ProjectConfig;
 
@@ -34,7 +34,7 @@ class Install extends Migration
 
         foreach ($fsConfigs as $uid => $config) {
             if (
-                in_array($config['type'], ['craft\awss3\Volume', Fs::class]) &&
+                in_array($config['type'], ['craft\alibabaoss\Volume', Fs::class]) &&
                 isset($config['settings']) &&
                 is_array($config['settings'])
             ) {

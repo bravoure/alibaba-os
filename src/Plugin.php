@@ -5,11 +5,8 @@
  * @license MIT
  */
 
-namespace craft\awss3;
+namespace craft\alibabaoss;
 
-use craft\base\Element;
-use craft\elements\Asset;
-use craft\events\ModelEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Fs as FsService;
 use yii\base\Event;
@@ -41,30 +38,6 @@ class Plugin extends \craft\base\Plugin
 
         Event::on(FsService::class, FsService::EVENT_REGISTER_FILESYSTEM_TYPES, function(RegisterComponentTypesEvent $event) {
             $event->types[] = Fs::class;
-        });
-
-        Event::on(Asset::class, Element::EVENT_AFTER_SAVE, function(ModelEvent $event) {
-            if (!$event->isNew) {
-                return;
-            }
-
-            /** @var Asset $asset */
-            $asset = $event->sender;
-            $filesystem = $asset->getFs();
-
-            if (!$filesystem instanceof Fs || !$filesystem->autoFocalPoint) {
-                return;
-            }
-
-            $fullPath = (!empty($filesystem->subfolder) ? rtrim($filesystem->subfolder, '/') . '/' : '') . $asset->getPath();
-
-            $focalPoint = $filesystem->detectFocalPoint($fullPath);
-
-            if (!empty($focalPoint)) {
-                $assetRecord = \craft\records\Asset::findOne($asset->id);
-                $assetRecord->focalPoint = min(max($focalPoint[0], 0), 1) . ';' . min(max($focalPoint[1], 0), 1);
-                $assetRecord->save();
-            }
         });
     }
 }

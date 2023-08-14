@@ -1,11 +1,12 @@
 <?php
 
-namespace craft\awss3\controllers;
+namespace craft\alibabaoss\controllers;
 
 use Craft;
-use craft\awss3\Fs;
+use craft\alibabaoss\Fs;
 use craft\helpers\App;
 use craft\web\Controller as BaseController;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -29,6 +30,7 @@ class BucketsController extends BaseController
      * Load bucket data for specified credentials.
      *
      * @return Response
+     * @throws BadRequestHttpException
      */
     public function actionLoadBucketData(): Response
     {
@@ -36,12 +38,12 @@ class BucketsController extends BaseController
         $this->requireAcceptsJson();
 
         $request = Craft::$app->getRequest();
-        $keyId = App::parseEnv($request->getRequiredBodyParam('keyId'));
-        $secret = App::parseEnv($request->getRequiredBodyParam('secret'));
+        $accessKeyId = App::parseEnv($request->getRequiredBodyParam('accessKeyId'));
+        $accessKeySecret = App::parseEnv($request->getRequiredBodyParam('accessKeySecret'));
 
         try {
             return $this->asJson([
-                'buckets' => Fs::loadBucketList($keyId, $secret),
+                'buckets' => Fs::loadBucketList($accessKeyId, $accessKeySecret),
             ]);
         } catch (\Throwable $e) {
             return $this->asFailure($e->getMessage());

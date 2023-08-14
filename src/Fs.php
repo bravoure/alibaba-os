@@ -7,16 +7,11 @@ declare(strict_types=1);
  * @license MIT
  */
 
-namespace craft\awss3;
+namespace craft\alibabaoss;
 
 use Aws\CloudFront\CloudFrontClient;
 use Aws\CloudFront\Exception\CloudFrontException;
-use Aws\Credentials\CredentialProvider;
-use Aws\Credentials\Credentials;
-use Aws\Handler\GuzzleV6\GuzzleHandler;
-use Aws\Rekognition\RekognitionClient;
 use Aws\S3\Exception\S3Exception;
-use Aws\Sts\StsClient;
 use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\flysystem\base\FlysystemFs;
@@ -26,12 +21,14 @@ use craft\helpers\Assets;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use DateTime;
+use Iidestiny\Flysystem\Oss\OssAdapter;
 use InvalidArgumentException;
-use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
-use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Visibility;
+use OSS\Core\OssException;
+use OSS\OssClient;
 use yii\base\Application;
+
 
 /**
  * Class Fs
@@ -68,7 +65,7 @@ class Fs extends FlysystemFs
      */
     public static function displayName(): string
     {
-        return 'Amazon S3';
+        return 'Alibaba Cloud OSS';
     }
 
     // Properties
@@ -80,14 +77,14 @@ class Fs extends FlysystemFs
     public string $subfolder = '';
 
     /**
-     * @var string AWS key ID
+     * @var string OSS access key ID
      */
-    public string $keyId = '';
+    public string $accessKeyId = '';
 
     /**
-     * @var string AWS key secret
+     * @var string AWS key accessKeySecret
      */
-    public string $secret = '';
+    public string $accessKeySecret = '';
 
     /**
      * @var string Bucket selection mode ('choose' or 'manual')
@@ -174,8 +171,8 @@ class Fs extends FlysystemFs
         $behaviors['parser'] = [
             'class' => EnvAttributeParserBehavior::class,
             'attributes' => [
-                'keyId',
-                'secret',
+                'accessKeyId',
+                'accessKeySecret',
                 'bucket',
                 'region',
                 'subfolder',
@@ -210,17 +207,14 @@ class Fs extends FlysystemFs
     /**
      * Get the bucket list using the specified credentials.
      *
-     * @param string|null $keyId The key ID
-     * @param string|null $secret The key secret
+     * @param string|null $accessKeyId The key ID
+     * @param string|null $accessKeySecret The key accessKeySecret
      * @return array
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|OssException
      */
-    public static function loadBucketList(?string $keyId, ?string $secret): array
+    public static function loadBucketList(?string $accessKeyId, ?string $accessKeySecret): array
     {
-        // Any region will do.
-        $config = self::buildConfigArray($keyId, $secret, 'us-east-1');
-
-        $client = static::client($config);
+        $client = static::client($accessKeyId, $accessKeySecret, null);
 
         $objects = $client->listBuckets();
 
@@ -233,23 +227,14 @@ class Fs extends FlysystemFs
 
         foreach ($buckets as $bucket) {
             try {
-                $region = $client->determineBucketRegion($bucket['Name']);
-            } catch (S3Exception $exception) {
-
-                // If a bucket cannot be accessed by the current policy, move along:
-                // https://github.com/craftcms/aws-s3/pull/29#issuecomment-468193410
+                $region = $client->getBucketLocation($bucket['Name']);
+            } catch (OssException $e) {
+                Craft::warning($e->getMessage());
                 continue;
-            }
-
-            if (str_contains($bucket['Name'], '.')) {
-                $urlPrefix = 'https://s3.' . $region . '.amazonaws.com/' . $bucket['Name'] . '/';
-            } else {
-                $urlPrefix = 'https://' . $bucket['Name'] . '.s3.amazonaws.com/';
             }
 
             $bucketList[] = [
                 'bucket' => $bucket['Name'],
-                'urlPrefix' => $urlPrefix,
                 'region' => $region,
             ];
         }
@@ -276,36 +261,32 @@ class Fs extends FlysystemFs
 
     /**
      * @inheritdoc
-     * @return AwsS3V3Adapter
+     * @return OssAdapter
+     * @throws OssException
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        $client = static::client($this->_getConfigArray(), $this->_getCredentials());
-        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
+        return new OssAdapter($this->accessKeyId, $this->accessKeySecret, '', $this->bucket, true, $this->_subfolder());
+//        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
     }
 
     /**
-     * Get the Amazon S3 client.
+     * Get the Alibaba Cloud OSS client.
      *
-     * @param array $config client config
-     * @param array $credentials credentials to use when generating a new token
-     * @return S3Client
+     * @param ?string $accessKeyId
+     * @param ?string $accessKeySecret
+     * @param ?string $bucket
+     * @return OssClient|null
      */
-    protected static function client(array $config = [], array $credentials = []): S3Client
+    protected static function client(?string $accessKeyId, ?string $accessKeySecret, ?string $bucket): ?OssClient
     {
-        if (!empty($config['credentials']) && $config['credentials'] instanceof Credentials) {
-            $config['generateNewConfig'] = static function() use ($credentials) {
-                $args = [
-                    $credentials['keyId'],
-                    $credentials['secret'],
-                    $credentials['region'],
-                    true,
-                ];
-                return call_user_func_array(self::class . '::buildConfigArray', $args);
-            };
+        try {
+            $ossClient = new OssClient($accessKeyId, $accessKeySecret, '', true);
+        } catch (OssException $e) {
+            Craft::warning($e->getMessage());
+            return null;
         }
-
-        return new S3Client($config);
+        return $ossClient;
     }
 
     /**
@@ -317,7 +298,7 @@ class Fs extends FlysystemFs
             $expires = new DateTime();
             $now = new DateTime();
             $expires->modify('+' . $this->expires);
-            $diff = (int)$expires->format('U') - (int)$now->format('U');
+            $diff = (int) $expires->format('U') - (int) $now->format('U');
             $config['CacheControl'] = 'max-age=' . $diff;
         }
 
@@ -378,107 +359,6 @@ class Fs extends FlysystemFs
         }
     }
 
-    /**
-     * Attempt to detect focal point for a path on the bucket and return the
-     * focal point position as an array of decimal parts
-     *
-     * @param string $filePath
-     * @return array
-     */
-    public function detectFocalPoint(string $filePath): array
-    {
-        $extension = StringHelper::toLowerCase(pathinfo($filePath, PATHINFO_EXTENSION));
-
-        if (!in_array($extension, ['jpeg', 'jpg', 'png'])) {
-            return [];
-        }
-
-
-        $client = new RekognitionClient($this->_getConfigArray());
-        $params = [
-            'Image' => [
-                'S3Object' => [
-                    'Name' => Craft::parseEnv($filePath),
-                    'Bucket' => Craft::parseEnv($this->bucket),
-                ],
-            ],
-        ];
-
-        $faceData = $client->detectFaces($params);
-
-        if (!empty($faceData['FaceDetails'])) {
-            $face = array_shift($faceData['FaceDetails']);
-            if ($face['Confidence'] > 80) {
-                $box = $face['BoundingBox'];
-                return [
-                    number_format($box['Left'] + ($box['Width'] / 2), 4),
-                    number_format($box['Top'] + ($box['Height'] / 2), 4),
-                ];
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * Build the config array based on a keyID and secret
-     *
-     * @param ?string $keyId The key ID
-     * @param ?string $secret The key secret
-     * @param ?string $region The region to user
-     * @param bool $refreshToken If true will always refresh token
-     * @return array
-     */
-    public static function buildConfigArray(?string $keyId = null, ?string $secret = null, ?string $region = null, bool $refreshToken = false): array
-    {
-        $config = [
-            'region' => $region,
-            'version' => 'latest',
-        ];
-
-        $client = Craft::createGuzzleClient();
-        $config['http_handler'] = new GuzzleHandler($client);
-
-        /** @noinspection MissingOrEmptyGroupStatementInspection */
-        if (empty($keyId) || empty($secret)) {
-            // Check for predefined access
-            if (App::env('AWS_WEB_IDENTITY_TOKEN_FILE') && App::env('AWS_ROLE_ARN')) {
-                // Check if anything is defined for a web identity provider (see: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_provider.html#assume-role-with-web-identity-provider)
-                $provider = CredentialProvider::assumeRoleWithWebIdentityCredentialProvider();
-                $provider = CredentialProvider::memoize($provider);
-                $config['credentials'] = $provider;
-            }
-            // Check if running on ECS
-            if (App::env('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI')) {
-                // Check if anything is defined for an ecsCredentials provider
-                $provider = CredentialProvider::ecsCredentials();
-                $provider = CredentialProvider::memoize($provider);
-                $config['credentials'] = $provider;
-            }
-            // If that didn't happen, assume we're running on EC2 and we have an IAM role assigned so no action required.
-        } else {
-            $tokenKey = static::CACHE_KEY_PREFIX . md5($keyId . $secret);
-            $credentials = new Credentials($keyId, $secret);
-
-            if (Craft::$app->cache->exists($tokenKey) && !$refreshToken) {
-                $cached = Craft::$app->cache->get($tokenKey);
-                $credentials->unserialize($cached);
-            } else {
-                $config['credentials'] = $credentials;
-                $stsClient = new StsClient($config);
-                $result = $stsClient->getSessionToken(['DurationSeconds' => static::CACHE_DURATION_SECONDS]);
-                $credentials = $stsClient->createCredentials($result);
-                $cacheDuration = $credentials->getExpiration() - time();
-                $cacheDuration = $cacheDuration > 0 ? $cacheDuration : static::CACHE_DURATION_SECONDS;
-                Craft::$app->cache->set($tokenKey, $credentials->serialize(), $cacheDuration);
-            }
-
-            // TODO Add support for different credential supply methods
-            $config['credentials'] = $credentials;
-        }
-
-        return $config;
-    }
 
     // Private Methods
     // =========================================================================
@@ -490,7 +370,7 @@ class Fs extends FlysystemFs
      */
     private function _subfolder(): string
     {
-        if ($this->subfolder && ($subfolder = rtrim(Craft::parseEnv($this->subfolder), '/')) !== '') {
+        if ($this->subfolder && ($subfolder = rtrim(App::parseEnv($this->subfolder), '/')) !== '') {
             return $subfolder . '/';
         }
 
@@ -517,7 +397,7 @@ class Fs extends FlysystemFs
      */
     private function _cfPrefix(): string
     {
-        if ($this->cfPrefix && ($cfPrefix = rtrim(Craft::parseEnv($this->cfPrefix), '/')) !== '') {
+        if ($this->cfPrefix && ($cfPrefix = rtrim(App::parseEnv($this->cfPrefix), '/')) !== '') {
             return $cfPrefix . '/';
         }
 
@@ -541,9 +421,7 @@ class Fs extends FlysystemFs
      */
     private function _getConfigArray(): array
     {
-        $credentials = $this->_getCredentials();
-
-        return self::buildConfigArray($credentials['keyId'], $credentials['secret'], $credentials['region']);
+        return $this->_getCredentials();
     }
 
     /**
@@ -554,9 +432,9 @@ class Fs extends FlysystemFs
     private function _getCredentials(): array
     {
         return [
-            'keyId' => Craft::parseEnv($this->keyId),
-            'secret' => Craft::parseEnv($this->secret),
-            'region' => Craft::parseEnv($this->region),
+            'accessKeyId' => App::parseEnv($this->accessKeyId),
+            'accessKeySecret' => App::parseEnv($this->accessKeySecret),
+            'region' => App::parseEnv($this->region),
         ];
     }
 
