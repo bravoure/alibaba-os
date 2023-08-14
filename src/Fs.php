@@ -198,7 +198,7 @@ class Fs extends FlysystemFs
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('aws-s3/fsSettings', [
+        return Craft::$app->getView()->renderTemplate('alibaba-oss/fsSettings', [
             'fs' => $this,
             'periods' => array_merge(['' => ''], Assets::periodList()),
         ]);

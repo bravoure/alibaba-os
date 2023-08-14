@@ -10,7 +10,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
- * This controller provides functionality to load data from AWS.
+ * This controller provides functionality to load data from Alibaba.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0
