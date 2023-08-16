@@ -9,9 +9,6 @@ declare(strict_types=1);
 
 namespace craft\alibabaoss;
 
-use Aws\CloudFront\CloudFrontClient;
-use Aws\CloudFront\Exception\CloudFrontException;
-use Aws\S3\Exception\S3Exception;
 use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\flysystem\base\FlysystemFs;
@@ -19,7 +16,6 @@ use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Assets;
 use craft\helpers\DateTimeHelper;
-use craft\helpers\StringHelper;
 use DateTime;
 use Iidestiny\Flysystem\Oss\OssAdapter;
 use InvalidArgumentException;
@@ -40,23 +36,6 @@ use yii\base\Application;
  */
 class Fs extends FlysystemFs
 {
-    // Constants
-    // =========================================================================
-
-    public const STORAGE_STANDARD = 'STANDARD';
-    public const STORAGE_REDUCED_REDUNDANCY = 'REDUCED_REDUNDANCY';
-    public const STORAGE_STANDARD_IA = 'STANDARD_IA';
-
-    /**
-     * Cache key to use for caching purposes
-     */
-    public const CACHE_KEY_PREFIX = 'aws.';
-
-    /**
-     * Cache duration for access token
-     */
-    public const CACHE_DURATION_SECONDS = 3600;
-
     // Static
     // =========================================================================
 
@@ -158,6 +137,8 @@ class Fs extends FlysystemFs
                 unset($config['manualBucket'], $config['manualRegion']);
             }
         }
+
+        $this->_getCredentials();
 
         parent::__construct($config);
     }
@@ -324,41 +305,6 @@ class Fs extends FlysystemFs
         return true;
     }
 
-    /**
-     * Purge any queued paths from the CDN.
-     */
-    public function purgeQueuedPaths(): void
-    {
-        if (!empty($this->pathsToInvalidate)) {
-            // If there's a CloudFront distribution ID set, invalidate the path.
-            $cfClient = $this->_getCloudFrontClient();
-            $items = [];
-
-            foreach ($this->pathsToInvalidate as $path => $bool) {
-                $items[] = '/' . $this->_cfPrefix() . ltrim($path, '/');
-            }
-
-            try {
-                $cfClient->createInvalidation(
-                    [
-                        'DistributionId' => Craft::parseEnv($this->cfDistributionId),
-                        'InvalidationBatch' => [
-                            'Paths' =>
-                                [
-                                    'Quantity' => count($items),
-                                    'Items' => $items,
-                                ],
-                            'CallerReference' => 'Craft-' . StringHelper::randomString(24),
-                        ],
-                    ]
-                );
-            } catch (CloudFrontException $exception) {
-                // Log the warning, most likely due to 404. Allow the operation to continue, though.
-                Craft::warning($exception->getMessage());
-            }
-        }
-    }
-
 
     // Private Methods
     // =========================================================================
@@ -391,40 +337,6 @@ class Fs extends FlysystemFs
     }
 
     /**
-     * Returns the parsed CloudFront distribution prefix
-     *
-     * @return string
-     */
-    private function _cfPrefix(): string
-    {
-        if ($this->cfPrefix && ($cfPrefix = rtrim(App::parseEnv($this->cfPrefix), '/')) !== '') {
-            return $cfPrefix . '/';
-        }
-
-        return '';
-    }
-
-    /**
-     * Get a CloudFront client.
-     *
-     * @return CloudFrontClient
-     */
-    private function _getCloudFrontClient(): CloudFrontClient
-    {
-        return new CloudFrontClient($this->_getConfigArray());
-    }
-
-    /**
-     * Get the config array for AWS Clients.
-     *
-     * @return array
-     */
-    private function _getConfigArray(): array
-    {
-        return $this->_getCredentials();
-    }
-
-    /**
      * Return the credentials as an array
      *
      * @return array
@@ -435,6 +347,7 @@ class Fs extends FlysystemFs
             'accessKeyId' => App::parseEnv($this->accessKeyId),
             'accessKeySecret' => App::parseEnv($this->accessKeySecret),
             'region' => App::parseEnv($this->region),
+            'bucket' => App::parseEnv($this->bucket),
         ];
     }
 
