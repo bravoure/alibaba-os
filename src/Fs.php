@@ -228,7 +228,7 @@ class Fs extends FlysystemFs
 
     private function getUrl(string $bucket, string $region): string
     {
-        return 'https://' . $bucket . '.' . $region . '.aliyuncs.com/';
+        return 'oss://' . $bucket;
     }
 
     /**
