@@ -228,6 +228,7 @@ class Fs extends FlysystemFs
 
     private function getUrl(string $bucket, string $region): string
     {
+        Craft::warning('oss://' . $bucket);
         return 'oss://' . $bucket;
     }
 
