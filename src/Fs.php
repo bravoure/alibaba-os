@@ -214,13 +214,21 @@ class Fs extends FlysystemFs
                 continue;
             }
 
+            $urlPrefix = 'https://' . $bucket['Name'] . '.' . $region . '.aliyuncs.com/';
+
             $bucketList[] = [
                 'bucket' => $bucket['Name'],
                 'region' => $region,
+                'urlPrefix' => $urlPrefix
             ];
         }
 
         return $bucketList;
+    }
+
+    private function getUrl(string $bucket, string $region): string
+    {
+        return 'https://' . $bucket . '.' . $region . '.aliyuncs.com/';
     }
 
     /**
@@ -247,7 +255,7 @@ class Fs extends FlysystemFs
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        return new OssAdapter($this->accessKeyId, $this->accessKeySecret, '', $this->bucket, true, $this->_subfolder());
+        return new OssAdapter($this->accessKeyId, $this->accessKeySecret, $this->getUrl($this->bucket, $this->region), $this->bucket, true, $this->_subfolder());
 //        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
     }
 

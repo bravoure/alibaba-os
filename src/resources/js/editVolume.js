@@ -113,11 +113,11 @@ $(document).ready(function () {
       $manualRegion.val().length
     ) {
       $fsUrl.val(
-        'https://s3.' +
-          $manualRegion.val() +
-          '.amazonaws.com/' +
+        'https://.' +
           $manualBucket.val() +
-          '/'
+          '.' +
+          $manualRegion.val() +
+          '.aliyuncs.com/'
       );
     }
   };
