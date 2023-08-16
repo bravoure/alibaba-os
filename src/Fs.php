@@ -255,7 +255,9 @@ class Fs extends FlysystemFs
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        return new OssAdapter($this->accessKeyId, $this->accessKeySecret, $this->getUrl($this->bucket, $this->region), $this->bucket, true, $this->_subfolder());
+        return new OssAdapter(App::parseEnv($this->accessKeyId), App::parseEnv($this->accessKeySecret),
+            $this->getUrl(App::parseEnv($this->bucket), App::parseEnv($this->region)), App::parseEnv($this->bucket),
+            true, $this->_subfolder());
 //        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
     }
 
