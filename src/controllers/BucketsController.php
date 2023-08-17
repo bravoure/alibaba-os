@@ -38,8 +38,8 @@ class BucketsController extends BaseController
         $this->requireAcceptsJson();
 
         $request = Craft::$app->getRequest();
-        $accessKeyId = App::parseEnv($request->getRequiredBodyParam('ossAccessKeyId'));
-        $accessKeySecret = App::parseEnv($request->getRequiredBodyParam('ossAccessKeySecret'));
+        $accessKeyId = App::parseEnv($request->getRequiredBodyParam('accessKeyId'));
+        $accessKeySecret = App::parseEnv($request->getRequiredBodyParam('accessKeySecret'));
 
         try {
             return $this->asJson([

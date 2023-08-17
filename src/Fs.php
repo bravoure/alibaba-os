@@ -230,7 +230,7 @@ class Fs extends FlysystemFs
     {
         Craft::warning('oss://' . $bucket);
         Craft::warning('http://' . $bucket . '.' . $region . '.aliyuncs.com/');
-        return 'http://' . $bucket . '.' . $region . '.aliyuncs.com/';
+        return 'https://' . $bucket . '.' . $region . '.aliyuncs.com/';
     }
 
     /**
@@ -257,9 +257,14 @@ class Fs extends FlysystemFs
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        return new OssAdapter(App::parseEnv($this->accessKeyId), App::parseEnv($this->accessKeySecret),
-            $this->getUrl(App::parseEnv($this->bucket), App::parseEnv($this->region)), App::parseEnv($this->bucket),
-            true, $this->_subfolder());
+        return new OssAdapter(
+            App::parseEnv($this->accessKeyId),
+            App::parseEnv($this->accessKeySecret),
+//            $this->getUrl(App::parseEnv($this->bucket), App::parseEnv($this->region)),
+            'https://oss-me-east-1-internal.aliyuncs.com',
+            App::parseEnv($this->bucket),
+            true,
+            $this->_subfolder());
 //        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
     }
 
