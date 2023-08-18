@@ -268,7 +268,7 @@ class Fs extends FlysystemFs
 //            App::parseEnv($this->ossEndpoint),
             'https://oss-me-central-1.aliyuncs.com',
             App::parseEnv($this->bucket),
-            true,
+            false,
             $this->_subfolder());
 //        return new AwsS3V3Adapter($client, Craft::parseEnv($this->bucket), $this->_subfolder(), new PortableVisibilityConverter($this->visibility()), null, [], false);
     }
