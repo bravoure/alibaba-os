@@ -265,7 +265,8 @@ class Fs extends FlysystemFs
         return new OssAdapter(
             App::parseEnv($this->accessKeyId),
             App::parseEnv($this->accessKeySecret),
-            App::parseEnv($this->ossEndpoint),
+//            App::parseEnv($this->ossEndpoint),
+            'https://oss-me-central-1.aliyuncs.com',
             App::parseEnv($this->bucket),
             true,
             $this->_subfolder());
