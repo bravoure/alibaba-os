@@ -261,7 +261,7 @@ class Fs extends FlysystemFs
             App::parseEnv($this->accessKeyId),
             App::parseEnv($this->accessKeySecret),
 //            $this->getUrl(App::parseEnv($this->bucket), App::parseEnv($this->region)),
-            'http://oss-me-east-1-internal.aliyuncs.com',
+            'https://oss-me-east-1-internal.aliyuncs.com',
             App::parseEnv($this->bucket),
             true,
             $this->_subfolder());
