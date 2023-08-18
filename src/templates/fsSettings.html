@@ -13,7 +13,7 @@
 
 {{ forms.autosuggestField({
     label: "Secret Access Key"|t('alibaba-oss'),
-    id: 'endpoint',
+    id: 'accessKeySecret',
     name: 'accessKeySecret',
     suggestEnvVars: true,
     value: fs.accessKeySecret,
@@ -108,74 +108,6 @@
     placeholder: "path/to/subfolder"|t('alibaba-oss')
 }) }}
 
-{{ forms.lightswitchField({
-    label: "Add the subfolder to the Base URL?"|t('alibaba-oss'),
-    instructions: "Turn this on if you want to add the specified subfolder to the Base URL."|t('alibaba-oss'),
-    name: 'addSubfolderToRootUrl',
-    on: fs.addSubfolderToRootUrl,
-}) }}
-
-{{ forms.lightswitchField({
-    label: "Make Uploads Public"|t('alibaba-oss'),
-    instructions: "Sets the ACL for uploaded objects.",
-    id: 'makeUploadsPublic',
-    name: 'makeUploadsPublic',
-    on: fs.makeUploadsPublic
-}) }}
-
 <hr />
-{% set cacheInput %}
-    {% set expires = (fs.expires|length > 0 ? fs.expires|split(' ') : ['', ''])%}
-
-    <div class="flex">
-        <div>
-            {{ forms.text({
-                id: 'expiresAmount',
-                value: expires[0],
-                size: 2,
-                class: 'oss-expires-amount'
-            }) }}
-        </div>
-        {{ forms.select({
-            id: 'expiresPeriod',
-            options: periods,
-            value: expires[1],
-            class: 'oss-expires-period'
-        }) }}
-    </div>
-    {{ forms.hidden({
-        name: "expires",
-        value: fs.expires,
-        class: "expires-combined"
-    }) }}
-{% endset %}
-
-{{ forms.field({
-    label: "Cache Duration"|t,
-    instructions: "The Cache-Control duration that assets should be uploaded to the cloud with.",
-    id: 'cacheDuration',
-}, cacheInput) }}
-
-{{ forms.autosuggestField({
-    label: "CloudFront Distribution ID"|t('alibaba-oss'),
-    instructions: "If you’re using CloudFront as CDN for your assets, enter the distribution ID here so Assets can purge the files from CDN."|t('alibaba-oss'),
-    id: 'cfDistributionId',
-    class: 'ltr',
-    name: 'cfDistributionId',
-    suggestEnvVars: true,
-    value: fs.cfDistributionId,
-    errors: fs.getErrors('cfDistributionId')
-}) }}
-
-{{ forms.autosuggestField({
-    label: "CloudFront Path Prefix"|t('alibaba-oss'),
-    instructions: "If you’re using CloudFront as CDN for your assets and have configured subfolders or custom behaviors, enter the path prefix Craft should use when invalidating files."|t('alibaba-oss'),
-    id: 'cfPrefix',
-    class: 'ltr',
-    name: 'cfPrefix',
-    suggestEnvVars: true,
-    value: fs.cfPrefix,
-    errors: fs.getErrors('cfPrefix')
-}) }}
 
 {% do view.registerAssetBundle("craft\\alibabaoss\\AlibabaOssBundle") %}
