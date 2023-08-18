@@ -13,13 +13,24 @@
 
 {{ forms.autosuggestField({
     label: "Secret Access Key"|t('alibaba-oss'),
-    id: 'accessKeySecret',
+    id: 'endpoint',
     name: 'accessKeySecret',
     suggestEnvVars: true,
     value: fs.accessKeySecret,
     errors: fs.getErrors('accessKeySecret'),
     class: 'oss-access-key-accessKeySecret-id',
     instructions: 'You can leave this field empty if you are using an EC2 instance with an applicable IAM role assignment.'|t('alibaba-oss')
+}) }}
+
+{{ forms.autosuggestField({
+    label: "OSS Endpoint"|t('alibaba-oss'),
+    id: 'endpoint',
+    name: 'endpoint',
+    suggestEnvVars: true,
+    value: fs.endpoint,
+    errors: fs.getErrors('endpoint'),
+    class: 'oss-endpoint',
+    instructions: 'Write OSS endpoint.'|t('alibaba-oss')
 }) }}
 
 {% set bucketInput %}

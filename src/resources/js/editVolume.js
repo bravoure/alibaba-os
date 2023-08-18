@@ -1,6 +1,7 @@
 $(document).ready(function () {
   const $ossAccessKeyId = $('.oss-access-key-id');
   const $ossAccessKeySecretId = $('.oss-access-key-secret-id');
+  const $ossEndpoint = $('.oss-endpoint');
   const $ossBucketSelect = $('.oss-bucket-select > select');
   const $ossRefreshBucketsBtn = $('.oss-refresh-buckets');
   const $ossRefreshBucketsSpinner = $ossRefreshBucketsBtn
@@ -25,6 +26,7 @@ $(document).ready(function () {
     const data = {
       keyId: $ossAccessKeyId.val(),
       secret: $ossAccessKeySecretId.val(),
+      endpoint: $ossEndpoint.val(),
     };
 
     Craft.sendActionRequest('POST', 'alibaba-oss/buckets/load-bucket-data', {data})
@@ -105,23 +107,4 @@ $(document).ready(function () {
     .keyup(ossChangeExpiryValue)
     .change(ossChangeExpiryValue);
   $('.oss-expires-period select').change(ossChangeExpiryValue);
-
-  const maybeUpdateUrl = function () {
-    if (
-      $hasUrls.val() &&
-      $manualBucket.val().length &&
-      $manualRegion.val().length
-    ) {
-      $fsUrl.val(
-        'https://.' +
-          $manualBucket.val() +
-          '.' +
-          $manualRegion.val() +
-          '.aliyuncs.com/'
-      );
-    }
-  };
-
-  $manualRegion.keyup(maybeUpdateUrl);
-  $manualBucket.keyup(maybeUpdateUrl);
 });
