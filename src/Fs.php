@@ -66,6 +66,11 @@ class Fs extends FlysystemFs
     public string $accessKeySecret = '';
 
     /**
+     * @var string OSS endpoint ossEndpoint
+     */
+    public string $ossEndpoint = '';
+
+    /**
      * @var string Bucket selection mode ('choose' or 'manual')
      */
     public string $bucketSelectionMode = 'choose';
@@ -260,8 +265,7 @@ class Fs extends FlysystemFs
         return new OssAdapter(
             App::parseEnv($this->accessKeyId),
             App::parseEnv($this->accessKeySecret),
-//            $this->getUrl(App::parseEnv($this->bucket), App::parseEnv($this->region)),
-            'https://oss-me-centar-1.aliyuncs.com',
+            App::parseEnv($this->ossEndpoint),
             App::parseEnv($this->bucket),
             true,
             $this->_subfolder());
