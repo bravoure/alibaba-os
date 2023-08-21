@@ -50,8 +50,6 @@ $(document).ready(function () {
           $ossBucketSelect.append(
             '<option value="' +
               data.buckets[i].bucket +
-              '" data-url-prefix="' +
-              data.buckets[i].urlPrefix +
               '" data-region="' +
               data.buckets[i].region +
               '">' +
@@ -89,22 +87,4 @@ $(document).ready(function () {
     $fsUrl.val($selectedOption.data('url-prefix'));
     $ossRegion.val($selectedOption.data('region'));
   });
-
-  const ossChangeExpiryValue = function () {
-    const parent = $(this).parents('.field');
-    const amount = parent.find('.oss-expires-amount').val();
-    const period = parent.find('.oss-expires-period select').val();
-
-    const combinedValue =
-      parseInt(amount, 10) === 0 || period.length === 0
-        ? ''
-        : amount + ' ' + period;
-
-    parent.find('[type=hidden]').val(combinedValue);
-  };
-
-  $('.oss-expires-amount')
-    .keyup(ossChangeExpiryValue)
-    .change(ossChangeExpiryValue);
-  $('.oss-expires-period select').change(ossChangeExpiryValue);
 });

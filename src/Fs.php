@@ -1,11 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * @link https://craftcms.com/
- * @copyright Copyright (c) Pixel & Tonic, Inc.
- * @license MIT
- */
 
 namespace craft\alibabaoss;
 
@@ -25,20 +20,8 @@ use OSS\Core\OssException;
 use OSS\OssClient;
 use yii\base\Application;
 
-
-/**
- * Class Fs
- *
- * @property mixed $settingsHtml
- * @property string $rootUrl
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 1.0
- */
 class Fs extends FlysystemFs
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -96,25 +79,10 @@ class Fs extends FlysystemFs
     public bool $makeUploadsPublic = true;
 
     /**
-     * @var string S3 storage class to use.
-     * @deprecated in 1.1.1
-     */
-    public string $storageClass = '';
-
-    /**
      * @var string CloudFront Distribution ID
      */
     public string $cfDistributionId = '';
 
-    /**
-     * @var string CloudFront Distribution Prefix
-     */
-    public string $cfPrefix = '';
-
-    /**
-     * @var bool Whether facial detection should be attempted to set the focal point automatically
-     */
-    public bool $autoFocalPoint = false;
 
     /**
      * @var bool Whether the specified sub folder should be added to the root URL
@@ -142,8 +110,6 @@ class Fs extends FlysystemFs
                 unset($config['manualBucket'], $config['manualRegion']);
             }
         }
-
-        $this->_getCredentials();
 
         parent::__construct($config);
     }
@@ -219,23 +185,13 @@ class Fs extends FlysystemFs
                 continue;
             }
 
-            $urlPrefix = 'https://' . $bucket['Name'] . '.' . $region . '.aliyuncs.com/';
-
             $bucketList[] = [
                 'bucket' => $bucket['Name'],
                 'region' => $region,
-                'urlPrefix' => $urlPrefix
             ];
         }
 
         return $bucketList;
-    }
-
-    private function getUrl(string $bucket, string $region): string
-    {
-        Craft::warning('oss://' . $bucket);
-        Craft::warning('http://' . $bucket . '.' . $region . '.aliyuncs.com/');
-        return 'https://' . $bucket . '.' . $region . '.aliyuncs.com/';
     }
 
     /**
@@ -354,21 +310,6 @@ class Fs extends FlysystemFs
             return $this->_subfolder();
         }
         return '';
-    }
-
-    /**
-     * Return the credentials as an array
-     *
-     * @return array
-     */
-    private function _getCredentials(): array
-    {
-        return [
-            'accessKeyId' => App::parseEnv($this->accessKeyId),
-            'accessKeySecret' => App::parseEnv($this->accessKeySecret),
-            'region' => App::parseEnv($this->region),
-            'bucket' => App::parseEnv($this->bucket),
-        ];
     }
 
     /**

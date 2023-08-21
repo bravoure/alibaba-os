@@ -8,7 +8,7 @@
     value: fs.accessKeyId,
     errors: fs.getErrors('accessKeyId'),
     class: 'oss-access-key-id',
-    instructions: 'You can leave this field empty if you are using an EC2 instance with an applicable IAM role assignment.'|t('alibaba-oss')
+    instructions: 'Write OSS Access Key ID.'|t('alibaba-oss')
 }) }}
 
 {{ forms.autosuggestField({
@@ -19,7 +19,7 @@
     value: fs.accessKeySecret,
     errors: fs.getErrors('accessKeySecret'),
     class: 'oss-access-key-accessKeySecret-id',
-    instructions: 'You can leave this field empty if you are using an EC2 instance with an applicable IAM role assignment.'|t('alibaba-oss')
+    instructions: 'Write OSS Secret Access Key.'|t('alibaba-oss')
 }) }}
 
 {{ forms.autosuggestField({

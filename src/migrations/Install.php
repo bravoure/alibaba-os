@@ -1,9 +1,5 @@
 <?php
-/**
- * @link https://craftcms.com/
- * @copyright Copyright (c) Pixel & Tonic, Inc.
- * @license MIT
- */
+
 
 namespace craft\alibabaoss\migrations;
 
@@ -12,12 +8,6 @@ use craft\alibabaoss\Fs;
 use craft\db\Migration;
 use craft\services\ProjectConfig;
 
-/**
- * Installation Migration
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 1.0
- */
 class Install extends Migration
 {
     // Public Methods

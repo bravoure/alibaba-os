@@ -1,9 +1,5 @@
 <?php
-/**
- * @link https://craftcms.com/
- * @copyright Copyright (c) Pixel & Tonic, Inc.
- * @license MIT
- */
+
 
 namespace craft\alibabaoss;
 
@@ -12,7 +8,7 @@ use craft\services\Fs as FsService;
 use yii\base\Event;
 
 /**
- * Plugin represents the Amazon S3 filesystem.
+ * Plugin represents the Alibaba OSS filesystem.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */

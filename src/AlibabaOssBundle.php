@@ -1,9 +1,5 @@
 <?php
-/**
- * @link https://craftcms.com/
- * @copyright Copyright (c) Pixel & Tonic, Inc.
- * @license MIT
- */
+
 
 namespace craft\alibabaoss;
 
