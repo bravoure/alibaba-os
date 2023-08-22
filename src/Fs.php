@@ -221,23 +221,16 @@ class Fs extends FlysystemFs
      * @inheritdoc
      * @return OssAdapter
      * @throws OssException
-     * @throws FilesystemException
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        $subFolder = $this->_subfolder();
-        $adapter =  new OssAdapter(
+        return new OssAdapter(
             App::parseEnv($this->accessKeyId),
             App::parseEnv($this->accessKeySecret),
             App::parseEnv($this->endpoint),
             App::parseEnv($this->bucket),
             false,
-            $subFolder);
-        if (!$adapter->directoryExists($subFolder)){
-            $adapter->createDirectory($subFolder, new Config());
-        }
-
-        return $adapter;
+            $this->_subfolder());
     }
 
     /**
