@@ -85,6 +85,10 @@ class Fs extends FlysystemFs
      */
     public string $cfDistributionId = '';
 
+    /**
+     * @var string CloudFront Distribution Prefix
+     */
+    public string $cfPrefix = '';
 
     /**
      * @var bool Whether the specified sub folder should be added to the root URL
@@ -329,5 +333,19 @@ class Fs extends FlysystemFs
     protected function visibility(): string
     {
         return $this->makeUploadsPublic ? Visibility::PUBLIC : Visibility::PRIVATE;
+    }
+
+    /**
+     * Returns the parsed CloudFront distribution prefix
+     *
+     * @return string
+     */
+    private function _cfPrefix(): string
+    {
+        if ($this->cfPrefix && ($cfPrefix = rtrim(Craft::parseEnv($this->cfPrefix), '/')) !== '') {
+            return $cfPrefix . '/';
+        }
+
+        return '';
     }
 }
