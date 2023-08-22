@@ -14,7 +14,9 @@ use craft\helpers\DateTimeHelper;
 use DateTime;
 use Iidestiny\Flysystem\Oss\OssAdapter;
 use InvalidArgumentException;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\Visibility;
 use OSS\Core\OssException;
 use OSS\OssClient;
@@ -215,16 +217,23 @@ class Fs extends FlysystemFs
      * @inheritdoc
      * @return OssAdapter
      * @throws OssException
+     * @throws FilesystemException
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        return new OssAdapter(
+        $subFolder = $this->_subfolder();
+        $adapter =  new OssAdapter(
             App::parseEnv($this->accessKeyId),
             App::parseEnv($this->accessKeySecret),
             App::parseEnv($this->endpoint),
             App::parseEnv($this->bucket),
             false,
-            $this->_subfolder());
+            $subFolder);
+        if (!$adapter->directoryExists($subFolder)){
+            $adapter->createDirectory($subFolder, new Config());
+        }
+
+        return $adapter;
     }
 
     /**
