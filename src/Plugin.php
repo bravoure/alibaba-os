@@ -10,7 +10,7 @@ use yii\base\Event;
 /**
  * Plugin represents the Alibaba OSS filesystem.
  *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
+ * @author Bravoure
  */
 class Plugin extends \craft\base\Plugin
 {
