@@ -1,5 +1,5 @@
 {
-  "name": "craftcms/alibaba-oss",
+  "name": "bravoure/alibaba-oss",
   "description": "Alibaba Cloud OSS integration for Craft CMS",
   "type": "craft-plugin",
   "keywords": [
