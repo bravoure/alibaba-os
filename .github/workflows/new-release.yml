@@ -1,0 +1,12 @@
+name: "Create new release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'patch | minor | major'
+        required: true
+
+jobs:
+  draft-new-release:
+    uses: bravoure/action-templates/.github/workflows/draft-new-release.yml@main

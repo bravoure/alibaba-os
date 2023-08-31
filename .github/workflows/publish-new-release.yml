@@ -1,0 +1,12 @@
+name: "Publish new release"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  release:
+    uses: bravoure/action-templates/.github/workflows/publish-new-release.yml@main

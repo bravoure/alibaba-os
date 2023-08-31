@@ -1,0 +1,9 @@
+name: Create draft pull request
+
+on:
+  create:
+    branches: feature/*
+
+jobs:
+  feature-draft-pull-request:
+    uses: bravoure/action-templates/.github/workflows/feature-draft-pull-request.yml@main
