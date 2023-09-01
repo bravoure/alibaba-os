@@ -30,8 +30,7 @@
     "php": "^8.0.2",
     "craftcms/cms": "^4.0.0-beta.1",
     "craftcms/flysystem": "^1.0.0-beta.2",
-    "aliyuncs/oss-sdk-php": "^2.6",
-    "iidestiny/flysystem-oss": "^4"
+    "aliyuncs/oss-sdk-php": "^2.6"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
