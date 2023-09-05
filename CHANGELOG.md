@@ -1,5 +1,9 @@
 # Release Notes for Alibaba OSS for Craft CMS
 
+## 1.0.2 - 2023-09-05
+
+Change icon size.
+
 ## 1.0.1 - 2023-09-01
 
 Fix readStream.
