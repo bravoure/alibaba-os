@@ -35,4 +35,4 @@ composer require craftcms/alibaba-oss
 
 To create a new Alibaba OSS filesystem to use with your volumes, visit **Settings** → **Filesystems**, and press **New filesystem**. Select “Alibaba OSS” for the **Filesystem Type** setting and configure as needed.
 
-> 💡 The Access Key ID, Access Key Secret, Bucket, Region and Subfolder settings can be set to environment variables. See [Environmental Configuration](https://craftcms.com/docs/4.x/config/#environmental-configuration) in the Craft docs to learn more about that.
+> 💡 The Access Key ID, Access Key Secret, Bucket, Region and Subfolder settings can be set to environment variables. See [Environmental Configuration](https://craftcms.com/docs/4.x/config/#environmental-configuration) in the Craft docs to learn more about that
