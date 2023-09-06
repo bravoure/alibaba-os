@@ -221,13 +221,7 @@ class Fs extends FlysystemFs
      */
     protected function createAdapter(): FilesystemAdapter
     {
-        return new OssAdapter(
-            App::parseEnv($this->accessKeyId),
-            App::parseEnv($this->accessKeySecret),
-            App::parseEnv($this->endpoint),
-            App::parseEnv($this->bucket),
-            false,
-            $this->_subfolder());
+        return static::client($this->accessKeyId, $this->accessKeySecret, $this->endpoint, $this->bucket, $this->_subfolder());
     }
 
     /**
@@ -238,15 +232,15 @@ class Fs extends FlysystemFs
      * @param ?string $bucket
      * @return OssClient|null
      */
-    protected static function client(?string $accessKeyId, ?string $accessKeySecret, ?string $bucket): ?OssClient
+    protected static function client(?string $accessKeyId, ?string $accessKeySecret, $endpoint, ?string $bucket, $subfolder): ?OssAdapter
     {
-        try {
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, '', true);
-        } catch (OssException $e) {
-            Craft::warning($e->getMessage());
-            return null;
-        }
-        return $ossClient;
+        return new OssAdapter(
+            App::parseEnv($accessKeyId),
+            App::parseEnv($accessKeySecret),
+            App::parseEnv($endpoint),
+            App::parseEnv($bucket),
+            false,
+            $subfolder);
     }
 
     /**
